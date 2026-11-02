@@ -1,0 +1,17 @@
+{
+  "basis": [
+    200
+  ],
+  "mazes": [
+    "u_maze",
+    "narrow"
+  ],
+  "grid": 40,
+  "maxiter": 240,
+  "mc": 5000,
+  "steps": 96,
+  "output": "outputs/high_basis_200",
+  "sigma": 0.2,
+  "gain": 1.0,
+  "seed": 20261101
+}

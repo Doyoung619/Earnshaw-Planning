@@ -1,0 +1,19 @@
+{
+  "grid": 100,
+  "basis": 500,
+  "maxiter": 60,
+  "mc": 5000,
+  "theta_max": 80.0,
+  "u_max": 10.0,
+  "steps": 96,
+  "output": "outputs/refined_M500",
+  "mazes": [
+    "narrow"
+  ],
+  "sigma": 0.2,
+  "gain": 1.0,
+  "seed": 20261101,
+  "wall_safety": "repulsive",
+  "wall_floor": 1.0,
+  "minimum_inward_speed": 0.0
+}

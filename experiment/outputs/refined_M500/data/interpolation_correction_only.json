@@ -1,0 +1,172 @@
+[
+  {
+    "maze": "u_maze",
+    "old_report_sde": {
+      "n": 5000,
+      "collision_rate": 0.9352,
+      "collision_ci": [
+        0.9280367684574926,
+        0.9416949992307573
+      ],
+      "arrival_rate": 0.0192,
+      "arrival_ci": [
+        0.01574896030669719,
+        0.023389288993600408
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 0.0648,
+      "risk_lower": 0.9352,
+      "risk_upper": 0.9352,
+      "risk_upper_ci": [
+        0.9280367684574926,
+        0.9416949992307573
+      ],
+      "mean_exit_observed": 7.255858407430756,
+      "restricted_mean_exit": 7.255858407430756,
+      "horizon": 45.0,
+      "simulation_seconds": 10.186821800016332,
+      "dt": 0.0015160216132635415
+    },
+    "interior_only_sde": {
+      "n": 1000,
+      "collision_rate": 0.931,
+      "collision_ci": [
+        0.9135849276398866,
+        0.945116285778645
+      ],
+      "arrival_rate": 0.035,
+      "arrival_ci": [
+        0.025272112485012703,
+        0.0482869032003305
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 0.069,
+      "risk_lower": 0.931,
+      "risk_upper": 0.931,
+      "risk_upper_ci": [
+        0.9135849276398866,
+        0.945116285778645
+      ],
+      "mean_exit_observed": 7.455,
+      "restricted_mean_exit": 7.455,
+      "horizon": 45.0,
+      "simulation_seconds": 9.029546800011303,
+      "dt": 0.0015160216132635415,
+      "interpolation": "interior",
+      "collision_outward_command_fraction": 0.42857142857142855
+    },
+    "deterministic": {
+      "n": 1,
+      "collision_rate": 0.0,
+      "collision_ci": [
+        0.0,
+        0.7934567085261071
+      ],
+      "arrival_rate": 0.0,
+      "arrival_ci": [
+        0.0,
+        0.7934567085261071
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 1.0,
+      "risk_lower": 0.0,
+      "risk_upper": 0.0,
+      "risk_upper_ci": [
+        0.0,
+        0.7934567085261071
+      ],
+      "mean_exit_observed": 28.0,
+      "restricted_mean_exit": 28.0,
+      "horizon": 45.0,
+      "simulation_seconds": 4.392853599973023,
+      "dt": 0.0015160216132635415,
+      "interpolation": "interior",
+      "collision_outward_command_fraction": null
+    }
+  },
+  {
+    "maze": "narrow",
+    "old_report_sde": {
+      "n": 5000,
+      "collision_rate": 0.9546,
+      "collision_ci": [
+        0.948472206126794,
+        0.9600297736321178
+      ],
+      "arrival_rate": 0.0004,
+      "arrival_ci": [
+        0.0001096989857531115,
+        0.001457416967717518
+      ],
+      "timeout_rate": 0.0002,
+      "eventual_goal_rate": 0.0452,
+      "risk_lower": 0.9546,
+      "risk_upper": 0.9548,
+      "risk_upper_ci": [
+        0.9486841376154079,
+        0.9602175350514487
+      ],
+      "mean_exit_observed": 8.290218062941493,
+      "restricted_mean_exit": 8.297560019328905,
+      "horizon": 45.0,
+      "simulation_seconds": 17.02031910000369,
+      "dt": 0.0017602379055911312
+    },
+    "interior_only_sde": {
+      "n": 1000,
+      "collision_rate": 0.961,
+      "collision_ci": [
+        0.9471303986994359,
+        0.971341200803912
+      ],
+      "arrival_rate": 0.002,
+      "arrival_ci": [
+        0.000548632102457155,
+        0.007262958889587807
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 0.039,
+      "risk_lower": 0.961,
+      "risk_upper": 0.961,
+      "risk_upper_ci": [
+        0.9471303986994359,
+        0.971341200803912
+      ],
+      "mean_exit_observed": 7.763,
+      "restricted_mean_exit": 7.763,
+      "horizon": 45.0,
+      "simulation_seconds": 5.476160300022457,
+      "dt": 0.0017602379055911312,
+      "interpolation": "interior",
+      "collision_outward_command_fraction": 0.4120707596253902
+    },
+    "deterministic": {
+      "n": 1,
+      "collision_rate": 0.0,
+      "collision_ci": [
+        0.0,
+        0.7934567085261071
+      ],
+      "arrival_rate": 0.0,
+      "arrival_ci": [
+        0.0,
+        0.7934567085261071
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 1.0,
+      "risk_lower": 0.0,
+      "risk_upper": 0.0,
+      "risk_upper_ci": [
+        0.0,
+        0.7934567085261071
+      ],
+      "mean_exit_observed": 30.0,
+      "restricted_mean_exit": 30.0,
+      "horizon": 45.0,
+      "simulation_seconds": 3.125307200010866,
+      "dt": 0.0017602379055911312,
+      "interpolation": "interior",
+      "collision_outward_command_fraction": null
+    }
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "maze": "narrow",
+  "spec_name": "S2",
+  "delta": 0.05,
+  "epsilon": 0.05,
+  "T": 15.0,
+  "mode": "joint",
+  "theta": [
+    0.4,
+    1.4857142857142858,
+    2.571628571428571,
+    3.657142857142857,
+    4.742857142857143,
+    5.828571428571428,
+    6.914285714285715,
+    8.0
+  ],
+  "p": 0.9999994997073317,
+  "q": 5.002657112350209e-07,
+  "rho": 0.9499994997342888,
+  "ctmc_pass": false,
+  "sde_point_pass": false,
+  "sde_ci_pass": false,
+  "mean_exit_ctmc": 0.9835490160163448,
+  "max_command_speed": 2.6555142108045047,
+  "optimization_seconds": 1.202700600028038,
+  "evaluations": 18,
+  "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+  "sde": {
+    "n": 5000,
+    "collision_rate": 1.0,
+    "collision_ci": [
+      0.9992322698624194,
+      1.0000000000000002
+    ],
+    "arrival_rate": 0.0,
+    "arrival_ci": [
+      0.0,
+      0.000767730137580694
+    ],
+    "timeout_rate": 0.0,
+    "eventual_goal_rate": 0.0,
+    "risk_lower": 1.0,
+    "risk_upper": 1.0,
+    "mean_exit_observed": 0.9247129999999999,
+    "restricted_mean_exit": 0.9247129999999999,
+    "horizon": 45.0,
+    "simulation_seconds": 0.5301479999907315,
+    "dt": 0.005
+  },
+  "residual": 1.2212453270876722e-14
+}

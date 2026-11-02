@@ -1,0 +1,52 @@
+{
+  "maze": "u_maze",
+  "spec_name": "S2",
+  "delta": 0.05,
+  "epsilon": 0.05,
+  "T": 15.0,
+  "mode": "risk_only",
+  "theta": [
+    7.169277256165491,
+    8.0,
+    7.3078170071244575,
+    7.925662287269384,
+    7.252673558884628,
+    7.639573272464517,
+    8.0,
+    7.833239370028743
+  ],
+  "p": 0.9996362295855524,
+  "q": 9.179409370352288e-07,
+  "rho": 0.9499990820590629,
+  "ctmc_pass": false,
+  "sde_point_pass": false,
+  "sde_ci_pass": false,
+  "mean_exit_ctmc": 6.243556436168098,
+  "max_command_speed": 27.48194498815725,
+  "optimization_seconds": 2.5873203999944963,
+  "evaluations": 179,
+  "optimizer_message": "STOP: TOTAL NO. OF F,G EVALUATIONS EXCEEDS LIMIT",
+  "sde": {
+    "n": 5000,
+    "collision_rate": 0.9998,
+    "collision_ci": [
+      0.998867881829747,
+      0.9999646951247276
+    ],
+    "arrival_rate": 0.0,
+    "arrival_ci": [
+      0.0,
+      0.000767730137580694
+    ],
+    "timeout_rate": 0.0002,
+    "eventual_goal_rate": 0.0,
+    "risk_lower": 0.9998,
+    "risk_upper": 1.0,
+    "mean_exit_observed": 5.564294853707465,
+    "restricted_mean_exit": 5.572181994736724,
+    "horizon": 45.0,
+    "simulation_seconds": 19.849086999951396,
+    "dt": 0.000933013498574249
+  },
+  "residual": 3.774758283725532e-15
+}

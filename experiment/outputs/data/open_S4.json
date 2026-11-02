@@ -1,0 +1,56 @@
+{
+  "maze": "open",
+  "spec_name": "S4",
+  "delta": 0.05,
+  "epsilon": 0.05,
+  "T": 10.0,
+  "mode": "joint",
+  "theta": [
+    0.8886383428028714,
+    4.358006004841285,
+    6.666861300000959,
+    7.092956429302758,
+    5.395468047473551,
+    7.136127895138525,
+    4.849407960793821,
+    6.316820868021952
+  ],
+  "p": 0.002874051090743049,
+  "q": 0.9971217957788786,
+  "rho": 0.0,
+  "ctmc_pass": true,
+  "sde_point_pass": true,
+  "sde_ci_pass": true,
+  "mean_exit_ctmc": 3.53302083034132,
+  "max_command_speed": 10.93552203027439,
+  "optimization_seconds": 0.6501027999911457,
+  "evaluations": 10,
+  "optimizer_message": "Initial candidate meets approximate specification",
+  "sde": {
+    "n": 5000,
+    "collision_rate": 0.0,
+    "collision_ci": [
+      0.0,
+      0.000767730137580694
+    ],
+    "arrival_rate": 1.0,
+    "arrival_ci": [
+      0.9992322698624194,
+      1.0
+    ],
+    "timeout_rate": 0.0,
+    "eventual_goal_rate": 1.0,
+    "risk_lower": 0.0,
+    "risk_upper": 0.0,
+    "mean_exit_observed": 3.3831985528690844,
+    "restricted_mean_exit": 3.3831985528690844,
+    "horizon": 45.0,
+    "simulation_seconds": 4.647902600001544,
+    "dt": 0.0023447463751652526,
+    "risk_upper_ci": [
+      0.0,
+      0.000767730137580694
+    ]
+  },
+  "residual": 8.881784197001252e-15
+}

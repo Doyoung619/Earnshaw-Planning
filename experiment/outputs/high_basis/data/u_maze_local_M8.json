@@ -1,0 +1,134 @@
+{
+  "maze": "u_maze",
+  "spec_name": "S2",
+  "delta": 0.05,
+  "epsilon": 0.05,
+  "T": 15.0,
+  "mode": "joint_adjoint",
+  "theta": [
+    4.195397758400968,
+    6.770689943103272,
+    8.0,
+    7.192193195323555,
+    6.856584976281375,
+    6.557485330230388,
+    5.989198833494629,
+    8.0
+  ],
+  "p": 0.9997899507432119,
+  "q": 1.023947781354228e-05,
+  "rho": 0.9499897605221864,
+  "ctmc_pass": false,
+  "sde_point_pass": false,
+  "sde_ci_pass": false,
+  "mean_exit_ctmc": 2.6085164363962337,
+  "max_command_speed": 24.692079448154434,
+  "optimization_seconds": 7.373000100022182,
+  "evaluations": 291,
+  "optimizer_message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH; CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH; CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+  "sde": {
+    "n": 5000,
+    "collision_rate": 1.0,
+    "collision_ci": [
+      0.9992322698624194,
+      1.0
+    ],
+    "arrival_rate": 0.0,
+    "arrival_ci": [
+      0.0,
+      0.000767730137580694
+    ],
+    "timeout_rate": 0.0,
+    "eventual_goal_rate": 0.0,
+    "risk_lower": 1.0,
+    "risk_upper": 1.0,
+    "risk_upper_ci": [
+      0.9992322698624194,
+      1.0
+    ],
+    "mean_exit_observed": 2.355734184444045,
+    "restricted_mean_exit": 2.355734184444045,
+    "horizon": 45.0,
+    "simulation_seconds": 7.214082899969071,
+    "dt": 0.0010384311979419836
+  },
+  "residual": 7.993605777301127e-15,
+  "M": 8,
+  "boundary_basis": "local",
+  "boundary_rank": 8,
+  "boundary_condition_number": 17.5717371171985,
+  "grid": 40,
+  "basis_seconds": 0.004897399980109185,
+  "ctmc_mc": {
+    "n": 5000,
+    "collision_rate": 0.9998,
+    "collision_ci": [
+      0.998867881829747,
+      0.9999646951247276
+    ],
+    "arrival_rate": 0.0,
+    "arrival_ci": [
+      0.0,
+      0.000767730137580694
+    ],
+    "timeout_rate": 0.0,
+    "eventual_goal_rate": 0.0002,
+    "risk_lower": 0.9998,
+    "risk_upper": 0.9998,
+    "risk_upper_ci": [
+      0.998867881829747,
+      0.9999646951247276
+    ],
+    "mean_exit_observed": 2.6417735593494194,
+    "restricted_mean_exit": 2.6417735593494194,
+    "horizon": 90.0,
+    "simulation_seconds": 0.02683510002680123
+  },
+  "fixed_controller_spec_evaluation": [
+    {
+      "name": "S1",
+      "delta": 0.1,
+      "epsilon": 0.1,
+      "T": 15.0,
+      "p": 0.9997899507432119,
+      "q": 1.023947781354228e-05,
+      "rho": 0.8999897605221865
+    },
+    {
+      "name": "S2",
+      "delta": 0.05,
+      "epsilon": 0.05,
+      "T": 15.0,
+      "p": 0.9997899507432119,
+      "q": 1.023947781354228e-05,
+      "rho": 0.9499897605221864
+    },
+    {
+      "name": "S3",
+      "delta": 0.01,
+      "epsilon": 0.05,
+      "T": 15.0,
+      "p": 0.9997899507432119,
+      "q": 1.023947781354228e-05,
+      "rho": 0.9897899507432119
+    },
+    {
+      "name": "S4",
+      "delta": 0.05,
+      "epsilon": 0.05,
+      "T": 10.0,
+      "p": 0.9997899507432119,
+      "q": 1.9388325843419586e-07,
+      "rho": 0.9499998061167415
+    },
+    {
+      "name": "S5",
+      "delta": 0.05,
+      "epsilon": 0.05,
+      "T": 7.0,
+      "p": 0.9997899507432119,
+      "q": 1.0104776645687794e-09,
+      "rho": 0.9499999989895223
+    }
+  ]
+}

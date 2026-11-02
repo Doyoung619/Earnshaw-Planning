@@ -1,0 +1,197 @@
+[
+  {
+    "maze": "open",
+    "exact_p": 0.002874051090743049,
+    "exact_q": 0.9971259486582235,
+    "ctmc_mc": {
+      "n": 5000,
+      "collision_rate": 0.0024,
+      "collision_ci": [
+        0.001373451819731108,
+        0.004190593213189199
+      ],
+      "arrival_rate": 0.9976,
+      "arrival_ci": [
+        0.9958094067868108,
+        0.998626548180269
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 0.9976,
+      "risk_lower": 0.0024,
+      "risk_upper": 0.0024,
+      "mean_exit_observed": 3.5432114048611854,
+      "restricted_mean_exit": 3.5432114048611854,
+      "horizon": 90.0,
+      "simulation_seconds": 0.029309600009582937
+    },
+    "backward_euler": [
+      {
+        "steps": 36,
+        "p": 0.002874051090743049,
+        "q": 0.9971253392089817
+      },
+      {
+        "steps": 72,
+        "p": 0.002874051090743049,
+        "q": 0.9971259221715219
+      },
+      {
+        "steps": 144,
+        "p": 0.002874051090743049,
+        "q": 0.9971259455581951
+      }
+    ],
+    "sde_half_step": {
+      "n": 5000,
+      "collision_rate": 0.0,
+      "collision_ci": [
+        0.0,
+        0.000767730137580694
+      ],
+      "arrival_rate": 1.0,
+      "arrival_ci": [
+        0.9992322698624194,
+        1.0000000000000002
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 1.0,
+      "risk_lower": 0.0,
+      "risk_upper": 0.0,
+      "mean_exit_observed": 3.388274401203382,
+      "restricted_mean_exit": 3.388274401203382,
+      "horizon": 45.0,
+      "simulation_seconds": 5.238346600031946,
+      "dt": 0.0011723731875826263
+    }
+  },
+  {
+    "maze": "u_maze",
+    "exact_p": 0.9998211559692728,
+    "exact_q": 3.928821981680523e-07,
+    "ctmc_mc": {
+      "n": 5000,
+      "collision_rate": 0.9994,
+      "collision_ci": [
+        0.99823726209947,
+        0.9997959290391145
+      ],
+      "arrival_rate": 0.0,
+      "arrival_ci": [
+        0.0,
+        0.000767730137580694
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 0.0006,
+      "risk_lower": 0.9994,
+      "risk_upper": 0.9994,
+      "mean_exit_observed": 5.929909909135364,
+      "restricted_mean_exit": 5.929909909135364,
+      "horizon": 90.0,
+      "simulation_seconds": 0.053268800023943186
+    },
+    "backward_euler": [
+      {
+        "steps": 36,
+        "p": 0.9998211559692728,
+        "q": 8.620445327464068e-07
+      },
+      {
+        "steps": 72,
+        "p": 0.9998211559692728,
+        "q": 6.124404873311944e-07
+      },
+      {
+        "steps": 144,
+        "p": 0.9998211559692728,
+        "q": 4.984865564413308e-07
+      }
+    ],
+    "sde_half_step": {
+      "n": 5000,
+      "collision_rate": 0.9998,
+      "collision_ci": [
+        0.998867881829747,
+        0.9999646951247276
+      ],
+      "arrival_rate": 0.0,
+      "arrival_ci": [
+        0.0,
+        0.000767730137580694
+      ],
+      "timeout_rate": 0.0002,
+      "eventual_goal_rate": 0.0,
+      "risk_lower": 0.9998,
+      "risk_upper": 1.0,
+      "mean_exit_observed": 5.003528004809984,
+      "restricted_mean_exit": 5.011527299209022,
+      "horizon": 45.0,
+      "simulation_seconds": 32.52057459997013,
+      "dt": 0.0004503602537561165
+    }
+  },
+  {
+    "maze": "narrow",
+    "exact_p": 0.9999999819034588,
+    "exact_q": 1.84521164475674e-17,
+    "ctmc_mc": {
+      "n": 5000,
+      "collision_rate": 1.0,
+      "collision_ci": [
+        0.9992322698624194,
+        1.0000000000000002
+      ],
+      "arrival_rate": 0.0,
+      "arrival_ci": [
+        0.0,
+        0.000767730137580694
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 0.0,
+      "risk_lower": 1.0,
+      "risk_upper": 1.0,
+      "mean_exit_observed": 7.316081173002999,
+      "restricted_mean_exit": 7.316081173002999,
+      "horizon": 90.0,
+      "simulation_seconds": 0.048540899995714426
+    },
+    "backward_euler": [
+      {
+        "steps": 36,
+        "p": 0.9999999819034588,
+        "q": 3.003789335194754e-15
+      },
+      {
+        "steps": 72,
+        "p": 0.9999999819034588,
+        "q": 4.2983627578212066e-16
+      },
+      {
+        "steps": 144,
+        "p": 0.9999999819034588,
+        "q": 1.1211617933944558e-16
+      }
+    ],
+    "sde_half_step": {
+      "n": 5000,
+      "collision_rate": 0.9992,
+      "collision_ci": [
+        0.9979446401752298,
+        0.9996888580554096
+      ],
+      "arrival_rate": 0.0,
+      "arrival_ci": [
+        0.0,
+        0.000767730137580694
+      ],
+      "timeout_rate": 0.0008,
+      "eventual_goal_rate": 0.0,
+      "risk_lower": 0.9992,
+      "risk_upper": 1.0,
+      "mean_exit_observed": 6.4038303385485875,
+      "restricted_mean_exit": 6.4347072742777485,
+      "horizon": 45.0,
+      "simulation_seconds": 40.68173620000016,
+      "dt": 0.000515081630410393
+    }
+  }
+]

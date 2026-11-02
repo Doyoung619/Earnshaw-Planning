@@ -1,0 +1,969 @@
+=== PAGE 1 ===
+Proceedings of Machine Learning Research vol vvv: 1–21, 2027
+Speciﬁcation-Driven Harmonic Navigation:
+Risk- and Time-Certiﬁed Potential Field Synthesis
+Doyoung Heo
+Abstract
+We study the inverse design of harmonic navigation ﬁelds from user-speciﬁed collision-risk and
+arrival-deadline requirements. An occupancy-grid maze is converted into a family of harmonic
+functions by solving Laplace boundary-value problems; their linear combination deﬁnes an ofﬂine-
+synthesized gradient controller. For a ﬁrst-order robot subject to isotropic Brownian disturbances,
+collision and ﬁnite-horizon safe-arrival probabilities satisfy linear backward equations for any ﬁxed
+controller. We develop (i) a conservative collision-risk condition afﬁne in the harmonic coefﬁcients,
+(ii) an automatically computable exponential exit-time certiﬁcate obtained from an eigenvalue prob-
+lem and a sparse linear solve, and (iii) feasibility screens based on Hamilton–Jacobi–Bellman equa-
+tions and parameter-space bounds. We distinguish exact probability evaluation, conservative cer-
+tiﬁcates, and veriﬁed impossibility claims. The results establish a rigorous problem formulation
+and a concrete algorithmic blueprint; efﬁciency improvements and tightness comparisons remain
+research objectives rather than established empirical ﬁndings.
+Keywords: harmonic navigation, stochastic reach–avoid, ﬁrst-passage time, boundary control,
+PDE-constrained synthesis, feasibility certiﬁcation.
+1. Introduction
+Motion planning is a central problem in robotics: ﬁnding a path that allows a robot to move from
+an initial position to a goal without colliding with obstacles. A broad range of methods has been
+developed to optimize path length and motion efﬁciency. In real environments, however, external
+disturbances and motion uncertainty can cause a robot to deviate from its planned path, affecting
+both collision outcomes and arrival times. Geometric path safety must therefore be complemented
+by an assessment of the probability of reaching the goal safely within a prescribed time .
+A variety of approaches has been studied for planning and controlling robot motion. Potential-
+ﬁeld navigation determines motion directions from the gradient of a scalar function encoding the
+goal and obstacles ( Khatib, 1986). Control barrier functions (CBFs) impose safety constraints on
+control inputs to prevent entry into unsafe regions ( Ames et al. , 2017). Learning-based approaches
+such as Diffusion Policy generate action sequences conditioned on observations through a diffusion
+model (Chi et al., 2023). These approaches offer different strengths in generating motion directions,
+enforcing safety, and learning complex behaviors. Nevertheless, constructing and verifying a con-
+troller that simultaneously satisﬁes prescribed collision-probability and arrival-time requirements
+remains a distinct design problem.
+This motivates the following question: given an environment and a model of the robot’s motion
+uncertainty, can we directly design a controller that satisﬁes speciﬁed collision-probability and
+arrival-time requirements? We treat these requirements as inputs to controller design. Rather than
+ﬁrst constructing a controller and then evaluating its performance, we seek a controller from user-
+speciﬁed safety and deadline requirements. We also aim to identify cases in which the requirements
+cannot be met because of the robot’s speed limit or the structure of the environment.
+© 2027 D. Heo.
+
+=== PAGE 2 ===
+HEO
+To this end, we consider controller design based on harmonic potentials. A nonconstant
+harmonic potential has no interior local minima in a connected maze domain, eliminating local-
+minimum traps away from the goal ( Connolly et al. , 1990; Connolly, 1993). Saddle points may
+remain, so this property alone does not guarantee goal convergence. Moreover, linear combinations
+of harmonic potentials remain harmonic. We can therefore construct a family of harmonic potentials
+from the maze geometry and vary the induced motion directions by adjusting their combination co-
+efﬁcients. The mathematical structure of harmonic potentials also allows probabilistic collision-risk
+certiﬁcates to be derived under the stochastic disturbance model considered here. We exploit these
+properties to search for a potential ﬁeld satisfying safety and deadline requirements by adjusting a
+small set of coefﬁcients , rather than designing a general spatial control function directly.
+Speciﬁcally, we ﬁrst construct a parameterized family of harmonic potentials from the maze
+geometry. For each candidate ﬁeld, we analyze the robot’s stochastic motion to compute the prob-
+ability of wall collision and the probability of safely reaching the goal within the deadline. These
+evaluations guide optimization of the ﬁeld coefﬁcients to satisfy both requirements, followed by
+veriﬁcation of the resulting controller. We further analyze performance limits over the class of
+speed-limited controllers to obtain criteria for certifying when the prescribed requirements are im-
+possible to achieve.
+The main contributions of this work are as follows:
+1. Speciﬁcation-driven potential-ﬁeld synthesis. We present a method for automatically con-
+structing harmonic potentials from a given maze geometry and representing a family of con-
+trollers through a small set of design variables.
+2. Controller design with probabilistic safety and deadline requirements. We formulate
+potential-ﬁeld synthesis using collision probabilities and ﬁnite-horizon safe-arrival probabili-
+ties to address both requirements jointly. We also derive conditions for certifying probabilistic
+performance from the mathematical properties of harmonic potentials.
+3. Feasibility assessment of prescribed requirements. We provide conditions for verifying
+that a candidate controller satisﬁes the requirements and criteria for mathematically certifying
+that they cannot be achieved under the given environment and speed limit.
+2. Related Work
+2.1. Artiﬁcial potential ﬁelds and harmonic navigation
+Khatib’s artiﬁcial potential ﬁelds introduced an inﬂuential reactive navigation mechanism: attraction
+to the goal and repulsion from obstacles are encoded in a spatial potential, whose gradient generates
+the instantaneous command ( Khatib, 1986). The approach is simple to execute but can introduce
+unintended local minima. Rimon and Koditschek developed navigation functions with stronger
+geometric and convergence properties, notably almost-global convergence under their stated con-
+ditions (Rimon and Koditschek , 1992). Such results concern a carefully constructed deterministic
+navigation structure and do not directly provide stochastic deadline probabilities.
+Connolly, Burns, and Weiss proposed solving Laplace’s equation for path planning ( Connolly
+et al. , 1990). Connolly subsequently detailed harmonic functions for robot navigation, including
+smooth paths and reactive control (Connolly, 1993). The maximum principle excludes interior local
+extrema for a nonconstant harmonic potential, but critical saddle points may remain; the property
+2
+
+=== PAGE 3 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+should not be confused with universal ﬁnite-time goal convergence. In our setting the harmonic
+ﬁeld deﬁnes a class of controllers that is searched using probabilistic speciﬁcations.
+2.2. Parameterized and customizable harmonic ﬁelds
+Optimizing harmonic ﬁelds is not new. Wang, Guo, and Guo investigated customization over ho-
+motopy classes by combining discrete geometric choices and continuous ﬁeld weights ( Wang et al.,
+2025). Nicu, Stoican, Ioan, and Prodan proposed harmonic surfaces with B-spline Dirichlet data on
+a polyhedral cell decomposition, creating safe transitions through a prescribed cell sequence ( Nicu
+et al., 2026). These methods motivate our use of a compact boundary basis and show that tunable
+boundary conditions should not be claimed as a standalone novelty. The primary difference is the
+speciﬁcation: rather than requesting a homotopy class or a cell sequence, we prescribe collision
+and deadline probabilities. The optimization variables represent boundary potentials, whereas the
+objectives and constraints arise from the stochastic dynamics.
+2.3. Collision probabilities and stochastic certiﬁcates
+Connolly’s analysis relates harmonic boundary problems to random-walk hitting probabilities ( Con-
+nolly, 1997). For a diffusion with an additional drift induced by a potential, hitting probabilities
+generally satisfy a drifted backward equation, not the same Laplace equation as the generating
+potential. Our treatment keeps this distinction explicit and uses harmonicity to construct an expo-
+nential martingale for a conservative risk bound.
+Stochastic barrier certiﬁcates furnish probability bounds for unsafe-state entry, often without
+enumerating trajectories; Prajna, Jadbabaie, and Pappas used supermartingale-type conditions and
+convex methods for appropriate system classes ( Prajna et al., 2004). Reach–avoid supermartingales
+have also been used to learn and certify policies for stochastic systems ( Žikeli´c et al. , 2023). Thus,
+joint stochastic reachability and safety certiﬁcation are established ideas. Our proposed distinction
+is a low-dimensional harmonic-boundary parameterization that makes some sufﬁcient conditions
+afﬁne in the coefﬁcients and produces an ofﬂine gradient controller without an online safety-ﬁltering
+quadratic program. This does not imply an absence of barrier-like certiﬁcates in the analysis.
+2.4. Arrival deadlines and feasibility
+Masoud developed space–time harmonic navigation with obstacle avoidance, speed limits, and
+prescribed arrival times, including feasibility-dependent motion ( Masoud, 2023). Related proba-
+bilistic temporal reach–avoid–stay frameworks use spatiotemporal tubes and formal chance con-
+straints ( Upadhyay et al. , 2026). Hence, neither explicit time requirements nor feasibility-aware
+navigation is new by itself. Our focus is speciﬁcally a static harmonic ﬁeld that must meet a joint
+stochastic collision/deadline speciﬁcation.
+The necessary feasibility screens below are instances of stochastic optimal-control dynamic
+programming, for which HJB and viscosity solution theory are standard ( Fleming and Soner, 2006).
+The sparse discretization follows continuous-time Markov-chain approximation principles (Kushner
+and Dupuis, 2001). A central unresolved question is whether this structured controller class enables
+materially faster or less conservative certiﬁed synthesis than general stochastic approaches.
+3
+
+=== PAGE 4 ===
+HEO
+3. Problem Setup
+3.1. Maze geometry and absorbing boundaries
+Consider a binary occupancy grid O ∈ { 0, 1}nx×ny , with nx,n y ∈ N grid dimensions and grid
+spacingh> 0 meters. V alue1 denotes an occupied cell; value 0 denotes free space. After inﬂating
+occupied cells by the robot footprint, let F ⊂ R2 denote the continuous free space. Let G ⊂ F be
+a target region with positive area, and let D ⊂ R2 be the bounded connected component of F \ G
+that contains the initial position.
+The boundary of D is partitioned into a wall/collision boundary ΓW and a goal boundary ΓG.
+For the analysis we assume they are disjoint, sufﬁciently smooth boundary components and ∂D =
+ΓW ∪ ΓG. An actual pixel maze must be smoothed or treated as a numerical approximation; its
+corners do not automatically satisfy all smooth-boundary assumptions. Let x0 ∈ D be the initial
+robot position. Both boundary components are absorbing: the trial ends at the ﬁrst contact with
+either one.
+3.2. Stochastic gradient controller
+LetXt ∈ R2 denote robot position in meters at time t ≥ 0 seconds. Let Bt ∈ R2 be a standard
+Brownian motion, ut ∈ R2 the commanded velocity in meters per second, and σ >0 an isotropic
+diffusion coefﬁcient with units meters per square-root second. We assume the ﬁrst-order motion
+model
+dXt =ut dt +σ dBt, X 0 =x0. (3.1)
+The random term models external disturbance, not exploration noise that the controller intentionally
+adds. Let k > 0 have units square meters per second and let Vθ : D → R be a dimensionless
+potential indexed by a parameter vector θ. The controller and resulting closed loop are
+uθ(x) = −k∇Vθ(x), (3.2)
+dXt = −k∇Vθ(Xt) dt +σ dBt. (3.3)
+The commanded velocity is subject to ∥uθ(x)∥2 ≤umax for allx ∈D, whereumax> 0 is measured
+in meters per second. Brownian sample paths have no ordinary instantaneous velocity; the bound
+constrains the command, not the stochastic path derivative.
+3.3. Harmonic basis and coefﬁcient dimensions
+Fix a positive integer M , the number of harmonic basis functions. For each i ∈ { 1,...,M }, let
+Vi :D → R be a harmonic function:
+∆Vi(x) = 0, x ∈D, ∆ := ∂2
+∂x2
+1
++ ∂2
+∂x2
+2
+. (3.4)
+Letθ = (θ1,...,θ M )⊤ ∈ RM collect dimensionless boundary-potential coefﬁcients, and deﬁne
+Vθ(x) =
+M∑
+i=1
+θiVi(x). (3.5)
+4
+
+=== PAGE 5 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+Table 1: Principal notation and physical meaning.
+Symbol Size / unit Meaning
+D, ΓW, ΓG subsets of R2 free interior, wall, and goal
+x0,Xt R2, meters initial and stochastic positions
+uθ R2, m/s commanded gradient velocity
+σ,k m/√s, m2/s diffusion and gradient gain
+M ,θ,A(x) integer, RM , R2×M basis size, coefﬁcients, gradients
+τ ,T seconds ﬁrst exit and deadline
+δ,ε probabilities risk and safe-arrival failure tolerances
+umax m/s velocity-command limit
+For compact notation, deﬁne the basis-value vector ϕ(x) := (V1(x),...,V M (x))⊤ ∈ RM and the
+basis-gradient matrix
+A(x) :=
+[
+∇V1(x) · · · ∇ VM (x)
+]
+∈ R2×M. (3.6)
+ThenVθ(x) = ϕ(x)⊤θ and
+uθ(x) = −kA(x)θ. (3.7)
+Harmonicity is preserved for everyθ because the Laplacian is linear. For the feasibility analysis, the
+admissible coefﬁcient set Θ ⊂ RM is assumed compact and includes the physical command bound:
+Θ := {θ ∈ RM : ∥θ∥∞ ≤θmax, k∥A(x)θ∥2 ≤umax ∀x ∈D}, (3.8)
+whereθmax> 0 is a user-chosen coefﬁcient limit. These coefﬁcient restrictions deﬁne the particular
+controller family whose feasibility is investigated; an infeasibility conclusion for this family need
+not hold for all gradient controllers or all admissible feedback policies.
+3.4. Exit events, probabilistic speciﬁcations, and units
+Let the ﬁrst exit time τ , wall-exit eventEW, and goal-exit event EG be
+τ := inf {t ≥ 0 : Xt ∈∂D}, E W := {Xτ ∈ ΓW}, E G := {Xτ ∈ ΓG}. (3.9)
+The process is stopped upon exit. Under the regularity assumptions below, τ < ∞ almost surely
+and exactly one ofEW,E G occurs. Let Pθ
+x and Eθ
+x denote probability and expectation for the closed
+loop with coefﬁcientθ starting fromX0 =x.
+The speciﬁcations are: a wall-risk tolerance δ ∈ (0, 1), a safe-arrival failure toleranceε ∈ (0, 1),
+and a deadline T >0 seconds. Their precise semantics are
+Pθ
+x0(EW) ≤δ, (3.10)
+Pθ
+x0(EG, τ ≤T ) ≥ 1 −ε. (3.11)
+The second constraint is safe arrival by a deadline, not a bound on the unconditional mean exit time
+and not a guarantee of arrival at exactly T .
+Problem 1 (Speciﬁcation-driven harmonic synthesis) Given the maze geometry, initial position
+x0, gain k, noise level σ, and requirements (δ,ε,T,u max), ﬁnd θ ∈ Θ satisfying Equations (3.10)
+and (3.11). Return a controller uθ = −k∇Vθ only when its speciﬁcations have been validated. If
+the speciﬁcations are provably impossible, return an infeasibility certiﬁcate; otherwise permit an
+undetermined outcome.
+5
+
+=== PAGE 6 ===
+HEO
+3.5. Regularity assumptions and the meaning of stability
+Assumption 2 (Well-posed stopped diffusion) The bounded connected domainD has sufﬁciently
+smooth boundary; the target and wall boundary components are disjoint. Each basis potential is
+C2(D) with a bounded, sufﬁciently regular gradient up to the boundary, and σ > 0 is constant.
+The resulting stopped SDE is well posed, and the exit time is almost surely ﬁnite. Classical PDE
+statements may be understood in the corresponding weak/viscosity sense if the required regularity
+is relaxed.
+Here safety means a bounded wall-hitting probability, and timely reachability means a lower bound
+on deadline success. Harmonicity does not imply Lyapunov stability of the stochastic dynamics
+around a goal point. In fact, the nondegenerate Brownian disturbance prevents hard, probability-
+one obstacle avoidance in general. The absence of spurious interior extrema also does not exclude
+saddle points of a deterministic gradient ﬂow.
+4. Method: Feasibility-Aware Inverse Harmonic Synthesis
+We separate ﬁeld construction, probability evaluation, certiﬁcate construction, and feasibility anal-
+ysis. This separation is essential: a computable upper bound is a sufﬁcient certiﬁcate, whereas the
+exact backward equations evaluate the chosen stochastic model and need not use that bound.
+4.1. From a maze to a harmonic basis
+SelectM sufﬁciently smooth boundary basis functions ψi : ∂D → R,i = 1,...,M . We choose
+ψi = 0 on ΓG and allow different values over wall segments. Each basis potential is the harmonic
+extension of its boundary data:
+∆Vi(x) = 0 ( x ∈D), V i(w) = ψi(w) ( w ∈∂D). (4.1)
+The value 0 on the goal is merely a gauge convention: adding a global constant to a potential does
+not change its gradient. Wall boundary values are free coefﬁcients and are not constrained to equal 1.
+We use continuous piecewise-linear or B-spline boundary basis functions rather than discontinuous
+indicator patches when regularity and bounded gradients matter.
+To discretize, let N be the number of interior potential nodes and B the number of boundary
+potential nodes. Write vI ∈ RN for unknown interior values and vB ∈ RB for speciﬁed boundary
+values. Let LII ∈ RN×N andLIB ∈ RN×B be the interior–interior and interior–boundary blocks
+of a ﬁnite-difference or ﬁnite-element discretization of the Laplacian. Let C ∈ RB×M store the
+sampled boundary basis functions columnwise. Then vB =Cθ and
+LIIvI +LIBCθ = 0, v I =Hθ, H := −L−1
+II LIBC ∈ RN×M. (4.2)
+Equation (4.2) describes a linear solve, not a recommendation to form a dense inverse. In practice,
+factorize sparse LII and solve for the M right-hand sides −LIBC. The ith column of H is the
+sampled ﬁeld Vi. Once the maze is ﬁxed, these columns can be reused for different risk/deadline
+speciﬁcations. When the maze geometry changes, its basis generally must be recomputed.
+6
+
+=== PAGE 7 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+4.2. Exact probability evaluation for a ﬁxed ﬁeld
+Deﬁne the positive diffusion constant d0 := σ2/2 (unit m 2/s). For a smooth scalar test function
+f :D → R, the controlled diffusion generator is
+Lθf (x) := d0∆f (x) −k∇Vθ(x)⊤∇f (x). (4.3)
+For a ﬁxed θ, let pθ(x) := Pθ
+x(EW) be wall-ﬁrst probability and let qθ(t,x ) := Pθ
+x(EG,τ ≤ t) be
+safe-goal-ﬁrst probability within t seconds. These functions solve the backward problems
+Lθpθ = 0 inD, pθ|ΓW = 1, pθ|ΓG = 0, (4.4)
+∂tqθ = Lθqθ fort> 0, x∈D, q θ(t, ·)|ΓW = 0, q θ(t, ·)|ΓG = 1, (4.5)
+qθ(0,x ) = 0 forx ∈D.
+The boundary values have direct meanings: a process starting on the wall has already failed, while
+a process starting on the goal has already succeeded. Consequently, problem 1 can be checked for a
+ﬁxed ﬁeld by comparingpθ(x0) withδ andqθ(T,x 0) with 1 −ε. These are model probabilities, not
+bounds from an assumed certiﬁcate. Numerical approximations still require validated discretization
+errors for a formal guarantee.
+4.3. How the time certiﬁcate is obtained
+This subsection speciﬁes S without introducing an unexplained free function.
+Step S1: Deﬁne the quantity we want to bound. The random exit time τ can be long even if its
+mean is modest. Choose an exponential rateλ> 0 with units s−1. Deﬁne the exponential exit-time
+moment
+Sθ,λ(x) := Eθ
+x[eλτ ]. (4.6)
+It is a dimensionless function of starting position, dependent on the chosen controller θ and rate λ.
+For example, an exit at τ = 5 s contributes e5λ; an exit at 10 s contributes e10λ. Long exits are
+weighted more heavily. From Markov’s inequality,
+Pθ
+x(τ >T ) ≤Sθ,λ(x)e−λT. (4.7)
+Crucially,τ denotes either wall or goal exit. A short wall-collision time does not imply successful
+navigation. We therefore combine Equation (4.7) with wall risk, or use a goal-weighted variant
+below.
+Step S2: Solve a linear boundary-value problem. The Feynman–Kac formula characterizes
+Sθ,λ through {
+LθSθ,λ(x) +λSθ,λ(x) = 0, x ∈D,
+Sθ,λ(w) = 1, w ∈∂D. (4.8)
+The boundary value equals 1 becauseτ = 0 at an absorbing boundary, and eλ·0 = 1 . For ﬁxed θ
+andλ, Equation (4.8) is linear in the unknown S. No neural network or additional learned model is
+required.
+7
+
+=== PAGE 8 ===
+HEO
+Step S3: Choose an admissible exponential rate. Letλ1(θ)> 0 be the principal Dirichlet eigen-
+value of −Lθ, i.e., the distinguished eigenvalue admitting a strictly positive interior eigenfunction
+φ:
+−Lθφ =λ1(θ)φ inD, φ = 0 on∂D. (4.9)
+For a bounded regular domain with uniformly nondegenerate diffusion and bounded drift, Sθ,λ
+is ﬁnite for 0 < λ < λ1(θ). The eigenvalue is a bound on how aggressively the exponential can
+amplify rare long exits. The scalarλ is a certiﬁcate tuning parameter, not a newly unknown physical
+property.
+Step S4: Form a sparse killed-generator matrix. We now describe a fully discrete calculation.
+Letxj ∈D denote interior grid node j,j = 1,...,N , and let
+uθ(xj) =: (uj,1,u j,2)⊤ ∈ R2.
+On a square grid with spacing h, deﬁne the four nonnegative continuous-time transition rates (units
+s−1)
+rj,→ := d0
+h2 + max(uj,1, 0)
+h , rj,← := d0
+h2 + max(−uj,1, 0)
+h ,
+rj,↑ := d0
+h2 + max(uj,2, 0)
+h , rj,↓ := d0
+h2 + max(−uj,2, 0)
+h . (4.10)
+These are the diffusion plus ﬁrst-order upwind-drift rates of a continuous-time Markov-chain ap-
+proximation ( Kushner and Dupuis , 2001). Unlike a simple central drift difference, they remain
+nonnegative for arbitrary bounded commands.
+Deﬁne the interior killed generator Qθ,h ∈ RN×N as follows. If interior nodes j and ℓ are
+nearest neighbors, entry (Qθ,h)jℓ equals the rate from j to ℓ; non-neighbor off-diagonal entries
+vanish. The diagonal entry is minus the sum of all four outgoing rates, including rates into absorbing
+boundaries. Deﬁne bW
+θ,h ∈ RN andbG
+θ,h ∈ RN as the sums of outgoing rates from each interior node
+to wall and goal boundary nodes respectively. Put bθ,h :=bW
+θ,h +bG
+θ,h. By construction,
+Qθ,h1N = −bθ,h, (4.11)
+where 1N ∈ RN is the all-ones vector. The letter Qθ,h is a stochastic generator, not the quadratic
+objective matrix introduced later.
+Step S5: Compute a discrete principal eigenvalue and solve. Letλ1,h(θ) > 0 be the smallest-
+real-part eigenvalue of −Qθ,h; the killed generator is a nonsingular M -matrix under standard
+connectivity-to-absorption conditions. For any 0<λ<λ 1,h(θ), form the dimensionless vector
+sθ,λ,h := (Sθ,λ,h(x1),...,S θ,λ,h(xN ))⊤ ∈ RN.
+It is obtained by a single sparse linear solve :
+(−Qθ,h −λIN )sθ,λ,h =bθ,h. (4.12)
+HereIN is theN ×N identity. Equation (4.12) is exact for the approximating ﬁnite-state continuous-
+time Markov chain and approximates the continuum S as the mesh is reﬁned under suitable consis-
+tency conditions. It does not by itself make a continuum certiﬁcation claim.
+8
+
+=== PAGE 9 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+Step S6: Optimize the one-dimensional rate. For a ﬁxedθ and given deadlineT , evaluate
+RT (θ,λ ) := Sθ,λ(x0)e−λT. (4.13)
+Search 0 < λ < λ1(θ) for the smallest valid upper bound. In computation replace continuum
+objects by their discrete approximations and repeat the solve Equation (4.12) for candidate rates.
+Increasing λ reduces e−λT but may drastically increase S, so choosing the largest possible rate
+is generally not optimal. If the inﬁmum is approached at an endpoint, report an approximating
+sequence rather than presuming an attained minimizer.
+Step S7: Optionally condition the moment on successful exit. Deﬁne the goal-weighted expo-
+nential moment
+SG
+θ,λ(x) := Eθ
+x[eλτ 1EG]. (4.14)
+The indicator 1EG is 1 on goal-ﬁrst exits and 0 otherwise. This function solves the same interior
+equation asS, but with goal boundary value 1 and wall boundary value 0:
+(Lθ +λ)SG
+θ,λ = 0 inD, S G|ΓG = 1, S G|ΓW = 0. (4.15)
+Its discrete counterpart requires only the goal-absorption right-hand side:
+(−Qθ,h −λIN )sG
+θ,λ,h =bG
+θ,h. (4.16)
+Since 1EG ≤ 1, 0 ≤SG
+θ,λ ≤Sθ,λ. Consequently,
+Pθ
+x0(EG,τ ≤T ) ≥ 1 −pθ(x0) −SG
+θ,λ(x0)e−λT. (4.17)
+This removes the contribution of wall-ending paths from the time-tail estimate, improving the bound
+for the sameθ andλ. Both versions are entirely determined by the maze, current controller, diffusion
+strength, and rate; they are not free functions that the method mysteriously assumes are available.
+4.4. A common sparse generator for all evaluations
+For the ﬁnite-state approximation, let pθ,h ∈ RN collect wall-ﬁrst probabilities at interior nodes,
+and let qθ,h(t) ∈ RN collect safe-goal arrival probabilities by time t. Using the same Qθ,h and
+boundary-rate vectors as above gives
+(−Qθ,h)pθ,h =bW
+θ,h, (4.18)
+dqθ,h
+dt =Qθ,hqθ,h +bG
+θ,h, q θ,h(0) = 0, (4.19)
+qθ,h(T ) =
+∫ T
+0
+eQθ,htbG
+θ,h dt. (4.20)
+Thus risk, ﬁnite-horizon success, exponential exit-time moments, and goal-weighted moments reuse
+the same sparse generator. See Appendix B for the ﬁrst-step derivation and a fully checked 3 × 3
+numerical example.
+9
+
+=== PAGE 10 ===
+HEO
+4.5. Direct probability-guided synthesis
+A ﬁxed exponential certiﬁcate is useful for veriﬁcation, but can be restrictive as a search device. IfS
+is computed from an initial controller and fails S(x0)e−λT ≤ε −δ, then changing θ while keeping
+S ﬁxed does not change that inequality’s left-hand side. We therefore distinguish direct synthesis
+from subsequent certiﬁcation.
+For a candidate θ, deﬁne the maximum speciﬁcation violation
+ρ(θ) := max {0, pθ(x0) −δ, 1 −ε −qθ(T,x 0)}. (4.21)
+Our principal synthesis problem is
+min
+θ∈Θ
+ρ(θ). (4.22)
+This is generally nonconvex, since Lθ depends on θ and so do the two probability solutions. We
+propose repeated sparse backward solves with sensitivity or adjoint differentiation, followed by a
+constrained nonlinear step in coefﬁcient space. A veriﬁed candidate with ρ(θ) = 0 solves the stated
+speciﬁcations, but failure of a local optimizer to reach zero is not an infeasibility proof.
+To make differentiation explicit, for each coefﬁcient index i ∈ { 1,...,M } deﬁne zp
+i (x) :=
+∂θipθ(x) andzq
+i (t,x ) := ∂θiqθ(t,x ). Differentiating Equations (4.4) and (4.5) gives
+Lθzp
+i =k∇V⊤
+i ∇pθ inD, z p
+i |∂D = 0, (4.23)
+∂tzq
+i = Lθzq
+i −k∇V⊤
+i ∇qθ, zq
+i (0, ·) = 0, z q
+i |∂D = 0. (4.24)
+These sensitivity equations are linear for ﬁxed θ. An adjoint implementation may be cheaper than
+solving one sensitivity PDE per coefﬁcient when M is large.
+4.6. Conservative convex synthesis with a ﬁxed time certiﬁcate
+A complementary construction is available when a sufﬁciently strong S is already known. Select
+a certiﬁed wall-risk budget ¯δ satisfying 0 < ¯δ < min{δ,ε }. Fix a rate λ > 0 and a smooth
+nonnegative functionS : D → R withS ≥ 1 andS(x0)e−λT ≤ ε − ¯δ. Deﬁne the gradient Gram
+matrixG ∈ RM×M by
+Gij :=
+∫
+D
+∇Vi(x)⊤∇Vj(x) dx (i,j = 1,...,M ). (4.25)
+G ⪰ 0 andθ⊤Gθ =
+∫
+D ∥∇Vθ∥2
+2 dx. Given regularization µ> 0, solve
+min
+θ∈Θ
+1
+2θ⊤(G +µIM )θ, (4.26a)
+subject to [ϕ(w) −ϕ(x0)]⊤θ ≥ σ2
+2k log 1
+¯δ, w ∈ ΓW, (4.26b)
+d0∆S(x) −k[A(x)θ]⊤∇S(x) +λS(x) ≤ 0, x ∈D. (4.26c)
+These are sufﬁcient, not necessary constraints; for ﬁxed S the ﬁeld-dependent inequalities are afﬁne
+in θ. The continuum problem has inﬁnitely many spatial constraints. A nodewise transcription
+is a ﬁnite convex approximation , not automatically a continuous-domain proof. Its status must be
+veriﬁed with spatial error bounds.
+10
+
+=== PAGE 11 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+4.7. Feasibility analysis before and after synthesis
+Let U denote all progressively measurable feedback/control processes that obey ∥ut∥2 ≤umax until
+absorption. The set includes time-varying policies and is generally much larger than the harmonic-
+gradient family. Deﬁne
+pmin(x) := inf
+u∈U
+Pu
+x(EW), (4.27)
+qmax(t,x ) := sup
+u∈U
+Pu
+x(EG,τ ≤t). (4.28)
+The HJB equations characterizing these optimal values are
+d0∆pmin −umax ∥∇pmin∥2 = 0 (x ∈D),
+pmin|ΓW = 1, p min|ΓG = 0. (4.29)
+∂tqmax =d0∆qmax +umax ∥∇qmax∥2, (t> 0, x∈D). (4.30)
+withqmax(0,x ) = 0 forx ∈D,qmax(t, ·) = 1 on ΓG and 0 on ΓW for positivet. If pmin(x0)> δ
+orqmax(T,x 0)< 1 −ε, the speciﬁcation is impossible for any speed-limited controller, hence also
+for our harmonic class. Passing both checks is not sufﬁcient for joint feasibility.
+For a stronger necessary joint test, introduce an arbitrary scalar β ≥ 0 and deﬁne
+J∗
+β(T,x 0) := sup
+u∈U
+[
+Pu
+x0(EG,τ ≤T ) −βPu
+x0(EW)
+]
+. (4.31)
+If J∗
+β(T,x 0) < 1 −ε −βδ for even one β ≥ 0, the joint speciﬁcation is impossible. Its time-
+dependent HJB has the same interior equation as Equation (4.30) , with boundary values 1 on the
+goal and −β on the wall and interior terminal datum J∗
+β(0,x ) = −βpmin(x). The latter assumes
+that, after the deadline, admissible control may still be chosen to minimize eventual wall risk; see
+Theorem 9.
+For the restricted harmonic family, global feasibility is instead characterized by
+ρ∗ := min
+θ∈Θ
+ρ(θ). (4.32)
+Under compactness and continuity, ρ∗ = 0 is equivalent to harmonic-family feasibility and ρ∗ >
+0 to infeasibility within Θ. Computing a rigorously positive lower bound for ρ∗ requires global
+veriﬁcation; a local nonzero result is inconclusive. We describe a coefﬁcient-space probability-
+sensitivity bound in Proposition 12 that supports branch-and-bound pruning.
+4.8. End-to-end procedure and returned status
+Input: (O,x 0, G,k,σ,δ,ε,T,u max).
+Step 1: Inﬂate obstacles, construct D, ΓW, ΓG, and build ψi andVi with sparse Laplace solves.
+Step 2: Apply validated HJB necessary conditions; stop with an impossibility proof if one is found.
+Step 3: Initializeθ ∈ Θ. Assemble Qθ,h,b W
+θ,h,b G
+θ,h and evaluate risk and deadline success.
+Step 4: Optimize the violation ρ(θ) by PDE sensitivities/adjoints; optionally use a ﬁxed-certiﬁcate
+convex subproblem as a warm start or a conservative reﬁnement.
+Step 5: For promising candidates, compute the discrete principal eigenvalue and the S andSG lin-
+ear systems for several λ.
+11
+
+=== PAGE 12 ===
+HEO
+Step 6: V erify continuous-domain risk, time, and command constraints with rigorous spatial and
+temporal error margins. If no candidate is certiﬁed, attempt global parameter-space exclusion.
+Output: FEASIBLE with a veriﬁedθ, INFEASIBLE with a valid universal or harmonic-family cer-
+tiﬁcate, or UNDETERMINED. A local solver’s failure alone must be reported as UNDETERMINED.
+The controller deployed after successful ofﬂine synthesis is simply uθ∗(x) = −k∇Vθ∗(x): no
+online CBF quadratic program is required, though online state estimation and low-level velocity
+tracking are assumed.
+5. Theory
+Our results distinguish structure, sufﬁcient certiﬁcates, necessary infeasibility tests , and numerical
+validation. Proofs and qualiﬁcations appear in Appendix A.
+Lemma 3 (Preservation of harmonic structure) Under assumption 2 , ∆Vθ = 0 for every θ ∈
+RM . Any nonconstant Vθ has no interior local maximum or minimum in the connected domain D.
+Proof Linearity gives ∆Vθ = ∑M
+i=1θi∆Vi = 0 . The strong maximum principle then excludes
+nonconstant interior local extrema.
+Saddle points may remain; this is not a ﬁnite-time deterministic stabilization theorem.
+Theorem 4 (Exponential harmonic collision-risk certiﬁcate) Leta := 2k/σ2 and letδ ∈ (0, 1).
+If a harmonic coefﬁcient vector θ obeys
+Vθ(w) −Vθ(x0) ≥ 1
+a log 1
+δ for everyw ∈ ΓW, (5.1)
+then Pθ
+x0(EW) ≤δ. Equivalently, the sufﬁcient condition is afﬁne in the ﬁeld coefﬁcients:
+[ϕ(w) −ϕ(x0)]⊤θ ≥ σ2
+2k log 1
+δ (w ∈ ΓW). (5.2)
+Proof [Proof sketch] For Z(x) := exp(aVθ(x)), harmonicity and a = 2k/σ2 give LθZ = 0 . Thus
+the stopped, bounded process Z(Xt∧τ ) is a martingale. If bθ := inf w∈ΓWVθ(w), optional stopping
+implieseaVθ(x0) = E[Z(Xτ )] ≥eabθ P(EW). Apply Equation (5.1). Full details are in Appendix A.
+Remark 5 (Sharper bound when goal potential is zero) IfVθ = 0 on ΓG andbθ > 0, then
+Pθ
+x0(EW) ≤ eaVθ(x0) − 1
+eabθ − 1 . (5.3)
+If the wall boundary potential is constant at bθ, equality holds. With nonconstant wall potential
+the right-hand side is a conservative upper bound. Unlike Equation (5.2), the sharper bound is
+generally nonlinear inθ.
+12
+
+=== PAGE 13 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+Theorem 6 (Automatic exponential exit-time certiﬁcate) Fixθ ∈ Θ and assume assumption 2 .
+Letλ1(θ)> 0 be the principal Dirichlet eigenvalue of −Lθ. F or each rate0<λ<λ 1(θ), the ﬁnite
+moment
+Sθ,λ(x) = Eθ
+x[eλτ ] (5.4)
+solves Equation (4.8), satisﬁesSθ,λ(x) ≥ 1, and obeys
+Pθ
+x(τ >T ) ≤Sθ,λ(x)e−λT, T > 0. (5.5)
+The goal-weighted moment deﬁned in Equation (4.14) satisﬁes Equation (4.15), and for the initial
+point
+Pθ
+x0(EG,τ ≤T ) ≥ 1 −pθ(x0) −SG
+θ,λ(x0)e−λT. (5.6)
+Proof [Proof sketch] The Feynman–Kac representation with absorbing boundary data yields the
+corresponding elliptic PDEs for rates below the principal eigenvalue. Markov’s inequality applied to
+eλτ proves Equation (5.5). Applied toeλτ 1EG, it bounds late successful exits, while P(EG) = 1 −pθ.
+See Appendix A.
+Corollary 7 (Joint safety and deadline guarantee) If the hypotheses of Theorems 4 and 6 hold
+and
+Sθ,λ(x0)e−λT ≤ε −δ, (5.7)
+then Pθ
+x0(EG,τ ≤T ) ≥ 1 −ε. The more direct Equation (5.6) replacesS bySG and the certiﬁcate
+boundδ by the exact wall-ﬁrst probability pθ(x0).
+Proof The complement of safe arrival by T is contained in the union of wall-ﬁrst exit and non-exit
+byT . Use the union bound and Theorems 4 and 6.
+Remark 8 (A vailability versus optimization of a time certiﬁcate) A ﬁxed ﬁeld θ induces a deﬁ-
+niteSθ,λ: no unspeciﬁed auxiliary design variable is needed to evaluate it. Jointly choosingθ andS
+is generally nonconvex because ∇V⊤
+θ ∇S is bilinear . Fixed-S optimization is convex but sufﬁcient
+and potentially conservative. The direct probability-guided program Equation (4.22) is therefore
+our default synthesis formulation.
+Theorem 9 (Universal necessary feasibility conditions) F or the class U of all admissible speed-
+limited policies, letpmin,qmax, andJ∗
+β be deﬁned by Equations (4.27), (4.28) and (4.31). Any of the
+following conditions proves that no admissible policy can meet both speciﬁcations in problem 1:
+pmin(x0)>δ, q max(T,x 0)< 1 −ε, (5.8)
+or ∃β ≥ 0 : J∗
+β(T,x 0)< 1 −ε −βδ. (5.9)
+A further necessary condition is pmin(x0) ≤ ε, because safe arrival by T with probability 1 −ε
+implies eventual wall failure probability at most ε.
+13
+
+=== PAGE 14 ===
+HEO
+Proof Every admissible u has wall probability at least pmin(x0) and deadline success probability
+at most qmax(T,x 0). If both requirements hold, then for every β ≥ 0 the weighted reward under
+thatu is at least 1 −ε −βδ, so its supremum cannot be smaller. The additional ε condition follows
+because goal-ﬁrst success by time T is a subset of eventual goal-ﬁrst exit.
+Remark 10 (Necessity is not sufﬁciency) Passing these HJB tests does not establish feasibility for
+a single policy , and certainly not for the smaller harmonic-gradient class. HJB outputs require
+certiﬁed numerical bounds before they can justify a formal INFEASIBLE ﬂag.
+Proposition 11 (Convexity of a ﬁxed-certiﬁcate synthesis problem) SupposeS ≥ 1,λ> 0, and
+0< ¯δ <min{δ,ε } are ﬁxed withS(x0)e−λT ≤ε−¯δ. Then Equation (4.26) is a semi-inﬁnite convex
+program inθ. Every continuum-feasible solution satisﬁes the original risk and deadline constraints,
+as well as the commanded velocity bound embedded in Θ.
+Proof The collision and ﬁxed-S inequalities are afﬁne inθ, the velocity constraints are second-order
+cone constraints, and G +µIM ≻ 0 gives a strictly convex quadratic objective. The probability
+claims follow from Theorem 4 and Corollary 7, replacing the wall-risk budget by ¯δ.
+Proposition 12 (Finite-horizon sensitivity in coefﬁcient space) LetLA := sup x∈D ∥A(x)∥op <
+∞. Here ∥·∥op denotes the spectral/operator norm. F or anyθ,θ′ ∈ Θ andT >0,
+|qθ(T,x 0) −qθ′(T,x 0)| ≤ kLA
+√
+T
+2σ
+‖‖θ −θ′‖‖
+2. (5.10)
+The statement uses the same nondegenerate diffusion under both policies and assumes the standard
+change-of-measure conditions, satisﬁed for bounded drifts.
+Proof [Proof sketch] The drift difference has uniform norm at most kLA ∥θ −θ′∥2. Girsanov’s
+theorem bounds pathwise Kullback–Leibler divergence over [0,T ] by k2L2
+AT ∥θ −θ′∥2
+2/(2σ2).
+Pinsker’s inequality bounds the difference of probabilities of any event measurable up to T by the
+square root of half this divergence. The safe-goal exit by T is such an event.
+A coefﬁcient-space ball {θ : ∥θ −θc∥2 ≤r} can therefore be excluded from deadline feasibility if
+qθc(T,x 0) + kLA
+√
+T
+2σ r< 1 −ε. (5.11)
+For ﬁnite-grid estimates, a certiﬁed upper bound for qθc is needed. Eventual wall risk is an inﬁnite-
+horizon event; applying the same argument to it requires a separate uniform exit-time-tail argument.
+Proposition 13 (Exact characterization of restricted feasibility) Assume Θ is compact and ρ :
+Θ → R in Equation (4.21) is continuous. Then ρ∗ := min θ∈Θρ(θ) exists. The restricted harmonic
+family is feasible if and only if ρ∗ = 0; it is infeasible within Θ if and only if ρ∗> 0.
+Proof Continuity and compactness give an attained minimum. By construction ρ(θ) = 0 exactly
+when both probability requirements hold; membership of Θ enforces the velocity limit.
+14
+
+=== PAGE 15 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+Proposition 14 (Residual-based validation of continuous probabilities) Let ˆpθ ∈ C2(D) ∩
+C(D) approximate pθ, with boundary error at most ηb ≥ 0 and interior generator residual
+|Lθ ˆpθ| ≤ ηr. If mmax bounds supx∈D Eθ
+x[τ ], then
+|pθ(x0) − ˆpθ(x0)| ≤ ηb +ηrmmax. (5.12)
+Similarly, if a sufﬁciently regularˆqθ has initial/boundary error at mostηib on the parabolic boundary
+and PDE residual at most ηt for 0 ≤t ≤T , then
+|qθ(T,x 0) − ˆqθ(T,x 0)| ≤ ηib +Tη t. (5.13)
+Proof [Proof sketch] Dynkin’s formula for the stopped diffusion represents the difference between
+pθ and ˆpθ as a boundary mismatch plus accumulated generator residual. The time-dependent result
+follows from the parabolic Dynkin/Feynman–Kac representation over the smaller of the remaining
+time and exit time. Details appear in Appendix C.
+The exponential moment also supplies Eθ
+x[τ ] ≤ (Sθ,λ(x) − 1)/λ becauseeλτ ≥ 1 +λτ . However,
+bounding the continuum residuals between grid nodes remains a separate veriﬁcation task.
+5.1. Scope of the claims
+The results above form an analytically consistent foundation; they are not yet a proved globally
+convergent synthesis algorithm. In particular, existing harmonic theory explains the absence of
+spurious interior extrema, standard stochastic analysis supplies the martingale and exit-time tools,
+HJB gives outer feasibility bounds, and convexity follows only after ﬁxing a suitable time certiﬁ-
+cate. Research-level advances remain to be demonstrated in certiﬁcate tightness, scalable global
+parameter search, veriﬁed numerical complexity, and comparative performance against established
+reach–avoid synthesis baselines.
+Generative AI Use
+Generative AI assistance was used to organize the LaTeX source ﬁles, apply the conference tem-
+plate, translate and edit the author-provided introduction, locate supporting references, and check
+compilation and document layout.
+References
+Aaron D. Ames, Xiangru Xu, Jessy W. Grizzle, and Paulo Tabuada. Control barrier function based
+quadratic programs for safety critical systems. IEEE Transactions on Automatic Control , 62(8):
+3861–3876, 2017. doi: 10.1109/TAC.2016.2638961.
+Cheng Chi, Siyuan Feng, Yilun Du, Zhenjia Xu, Eric Cousineau, Benjamin CM Burchﬁel, and Shu-
+ran Song. Diffusion Policy: Visuomotor policy learning via action diffusion. In Proceedings of
+Robotics: Science and Systems , Daegu, Republic of Korea, July 2023. doi: 10.15607/RSS.2023.
+XIX.026. URL https://www.roboticsproceedings.org/rss19/p026.html.
+Christopher I. Connolly. The applications of harmonic functions to robotics. Journal of Robotic
+Systems, 10(7):931–946, 1993. doi: 10.1002/rob.4620100704.
+15
+
+=== PAGE 16 ===
+HEO
+Christopher I. Connolly. Harmonic functions and collision probabilities. The International Journal
+of Robotics Research, 16(4):497–507, 1997. doi: 10.1177/027836499701600404.
+Christopher I. Connolly, J. Brian Burns, and Richard Weiss. Path planning using Laplace’s
+equation. In Proceedings of the IEEE International Conference on Robotics and Automation ,
+pages 2102–2106, 1990. URL https://courses.cs.washington.edu/courses/
+cse599j/12sp/papers/Connolly.pdf.
+Wendell H. Fleming and H. Mete Soner. Controlled Markov Processes and Viscosity Solutions ,
+volume 25 of Stochastic Modelling and Applied Probability . Springer, 2 edition, 2006. doi:
+10.1007/0-387-31071-1.
+Oussama Khatib. Real-time obstacle avoidance for manipulators and mobile robots. The Interna-
+tional Journal of Robotics Research , 5(1):90–98, 1986. doi: 10.1177/027836498600500106.
+Harold J. Kushner and Paul Dupuis. Numerical Methods for Stochastic Control Problems in Con-
+tinuous Time, volume 24 of Stochastic Modelling and Applied Probability . Springer, 2 edition,
+2001. doi: 10.1007/978-1-4613-0007-6.
+Ahmad A. Masoud. A space-time harmonic potential-based navigation control with guaranteed time
+of arrival and obstacle avoidance. IEEE Transactions on Automation Science and Engineering ,
+20(3):1785–1803, 2023. doi: 10.1109/TASE.2022.3186251.
+Theodor-Gabriel Nicu, Florin Stoican, Daniel-Mihail Ioan, and Ionela Prodan. Safe navigation
+in cluttered environments via spline-based harmonic potential ﬁelds, 2026. URL https://
+arxiv.org/abs/2601.13273. arXiv preprint.
+Stephen Prajna, Ali Jadbabaie, and George J. Pappas. Stochastic safety veriﬁcation using barrier
+certiﬁcates. In Proceedings of the 43rd IEEE Conference on Decision and Control , pages 929–
+934, 2004. doi: 10.1109/CDC.2004.1428804.
+Elon Rimon and Daniel E. Koditschek. Exact robot navigation using artiﬁcial potential functions.
+IEEE Transactions on Robotics and Automation , 8(5):501–518, 1992. doi: 10.1109/70.163777.
+Siddhartha Upadhyay, Ratnangshu Das, and Pushpak Jagtap. Spatiotemporal tubes for probabilistic
+temporal reach–avoid–stay task in uncertain dynamic environment. Nonlinear Analysis: Hybrid
+Systems, 62:101800, 2026. doi: 10.1016/j.nahs.2026.101800.
+Shuaikang Wang, Tiecheng Guo, and Meng Guo. Customize harmonic potential ﬁelds via hybrid
+optimization over homotopic paths. IEEE Robotics and Automation Letters , 10(8):8594–8601,
+2025. doi: 10.1109/LRA.2025.3587840.
+Ðor ¯de Žikeli ´c, Mathias Lechner, Thomas A. Henzinger, and Krishnendu Chatterjee. Learning con-
+trol policies for stochastic systems with reach-avoid guarantees. Proceedings of the AAAI Con-
+ference on Artiﬁcial Intelligence , 37(10):11926–11935, 2023. doi: 10.1609/aaai.v37i10.26407.
+16
+
+=== PAGE 17 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+Appendix A. Detailed Derivations and Clariﬁcations
+A.1. Why exponentiating a harmonic potential produces a martingale
+We detail Theorem 4. Recall that Lθf =d0∆f −k∇V⊤
+θ ∇f , with d0 =σ2/2. For a = 2k/σ2 =
+k/d0 andZ(x) = eaVθ(x),
+∇Z =aZ∇Vθ,
+∆Z =aZ∆Vθ +a2Z ∥∇Vθ∥2
+2 =a2Z ∥∇Vθ∥2
+2.
+Hence
+LθZ =d0a2Z ∥∇Vθ∥2
+2 −kaZ ∥∇Vθ∥2
+2
+=aZ(d0a −k) ∥∇Vθ∥2
+2 = 0.
+The stopped process Z(Xt∧τ ) is a true martingale when bounded by the extrema of the continuous
+potential on D. Optional stopping and dominated convergence yield E[Z(Xτ )] = Z(x0). On wall
+exit,Z(Xτ ) ≥eabθ , sopθ(x0) ≤ea(Vθ(x0)−bθ). This is the certiﬁcate in Theorem 4.
+For the sharper bound, assume Vθ = 0 at goal exit and Vθ ≥bθ > 0 at wall exit. Then
+eaVθ(x0) = E[Z(Xτ )]
+≥ (1 −pθ(x0)) · 1 +pθ(x0)eabθ
+= 1 +pθ(x0)(eabθ − 1).
+Rearrangement gives Equation (5.3) . If the wall boundary is exactly constant, the inequality be-
+comes an equality. This identity shows why the harmonic function is tied to stochastic hitting
+probabilities for this special gradient drift, but it should not be generalized to arbitrary drifts or
+anisotropic diffusion without re-derivation.
+A.2. Exit-time exponential moments and the principal eigenvalue
+For a ﬁxed stopped diffusion, the inﬁnitesimal generator Lθ acts on functions of position. Con-
+ditioning over a small initial time increment, or applying the Feynman–Kac formula, shows that
+Sθ,λ(x) = Ex[eλτ ] is the solution of (Lθ +λ)S = 0 inD with boundary condition S = 1. The ex-
+ponential moment need not be ﬁnite for arbitrary λ> 0. In a bounded regular domain, the positive
+principal eigenvalue λ1(θ) of the killed diffusion governs long-exit tails: 0 < λ < λ1(θ) ensures
+ﬁniteness, while approaching the eigenvalue may make the moment diverge.
+ForT > 0, the event τ > T equals {eλτ > eλT }. Markov’s inequality gives P(τ > T) ≤
+e−λT E[eλτ ]. Replacing the boundary function 1 by 1EG yieldsSG and bounds the event {EG,τ >
+T }. The identity
+P(EG,τ ≤T ) = P(EG) − P(EG,τ >T ) = 1 −pθ(x0) − P(EG,τ >T )
+then proves Equation (5.6).
+17
+
+=== PAGE 18 ===
+HEO
+A.3. Why the ﬁxed-certiﬁcate program is only sufﬁcient
+If a smooth functionS satisﬁesS ≥ 1 and (Lθ +λ)S ≤ 0, then the stopped processeλ(t∧τ )S(Xt∧τ )
+is a nonnegative supermartingale. The same argument yields P(τ > T) ≤ S(x0)e−λT , whether
+or not S equals the exact moment. When S is ﬁxed, the differential inequality is afﬁne in θ and
+becomes amenable to convex synthesis. But an arbitrary ﬁxed S may be too large at x0, and the
+conditionS(x0)e−λT ≤ε − ¯δ cannot be repaired by changing θ alone. Direct probability synthesis
+does not suffer from this particular artifact, although it is nonconvex.
+A.4. Weighted HJB feasibility criterion
+The minimum wall risk and maximum deadline success over all measurable velocity-bounded poli-
+cies satisfy stationary and time-dependent HJB equations, respectively, with the boundary/terminal
+values in Equations (4.29) and (4.30). For the joint test, consider a payoff 1 if the goal is hit before
+T ; payoff −β if the wall is ever hit before the goal; payoff 0 if the goal is hit after T . At remaining
+time 0 and still inside the maze, the goal bonus is unavailable, but future wall failure can still be
+reduced. Continuing optimally therefore gives terminal value −βpmin(x). Dynamic programming
+gives
+∂tJ∗
+β =d0∆J∗
+β +umax
+‖‖∇J∗
+β
+‖‖
+2, x ∈D,
+J∗
+β(t,w ) = 1, w ∈ ΓG,
+J∗
+β(t,w ) = −β, w ∈ ΓW,
+J∗
+β(0,x ) = −βpmin(x), x ∈D.
+A policy satisfying both original constraints would have weighted reward at least 1 −ε −βδ for
+everyβ ≥ 0. Hence one strictly smaller value of J∗
+β proves joint infeasibility. The converse is not
+claimed, and solving an HJB only approximately does not by itself yield a certiﬁed inequality.
+A.5. Girsanov–Pinsker bound for deadline success
+Let bθ(x) = −kA(x)θ denote the drift; the subscript b here denotes drift and is unrelated to the
+CTMC boundary-rate vector. For the same nondegenerate isotropic diffusion σI2, Girsanov’s theo-
+rem gives, up to time T , the relative-entropy identity or bound
+KL(P[0,T ]
+θ ∥P[0,T ]
+θ′ ) ≤ 1
+2σ2 Eθ
+∫ T
+0
+∥bθ(Xt) −bθ′(Xt)∥2
+2 dt.
+Here the paths can be continued with an identical zero drift after absorption, so that the safe-
+deadline event remains measurable and drift differences are zero after exit. Since ∥bθ −bθ′∥2 ≤
+kLA ∥θ −θ′∥2, the right-hand side is at most k2L2
+AT ∥θ −θ′∥2
+2/(2σ2). Pinsker’s inequality gives
+supE |Pθ(E) − Pθ′(E)| ≤
+√
+KL/2. Select E = {EG,τ ≤T } to prove Equation (5.10). A global
+parameter-space pruning procedure must also use a veriﬁed upper bound on qθc.
+Appendix B. Reproducible Calculation of the Time Certiﬁcate
+This appendix provides a step-by-step calculation with all numerical choices speciﬁed. It also illus-
+trates why an exit-time bound cannot replace a goal-success calculation.
+18
+
+=== PAGE 19 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+B.1. First-step derivation of the sparse time-certiﬁcate system
+Fix a ﬁnite-state continuous-time Markov chain obtained from a square grid. At an interior node
+j, let Rj > 0 denote the sum of the outgoing transition rates, and let Hj ∼ Exp(Rj) be the
+waiting time until the next jump. Let rjℓ denote the transition rate to a neighboring interior node
+ℓ. Let bj denote the total rate from node j into all absorbing wall and goal nodes. Thus Rj =∑
+ℓ interiorrjℓ +bj.
+LetSj denote E[eλτ ] starting at node j. Condition on the ﬁrst transition. The waiting time Hj
+is independent of its destination and has exponential moment E[eλHj ] = Rj/(Rj −λ) forλ<R j.
+The boundary value after a jump to an absorbing state is 1 because the remaining exit time is zero.
+Thus
+Sj = Rj
+Rj −λ
+[ ∑
+ℓ interior
+rjℓ
+Rj
+Sℓ + bj
+Rj
+]
+, (B.1)
+(Rj −λ)Sj −
+∑
+ℓ interior
+rjℓSℓ =bj. (B.2)
+Since (Qθ,h)jj = −Rj and off-diagonal entries are rjℓ, these equations stacked over all interior
+nodes give (−Qθ,h −λIN )s = b. For the goal-weighted moment, only jumps to goal boundary
+contribute the boundary value 1; wall-boundary jumps contribute 0. Replace b withbG to obtain
+Equation (4.16). This is an exact ﬁrst-step identity for the discrete chain.
+B.2. A checked nine-interior-node grid example
+Consider the square D = (0, 4) × (0, 4) meters, with grid spacing h = 1 meter. There are N = 9
+interior grid nodes xr,c = (c,r ) forr,c ∈ { 1, 2, 3}. The left boundary x1 = 0 is the goal; the top,
+bottom, and right boundaries are walls. The start node is the center (2, 2), indexed as j0 = 5 in
+row-major order. Take the harmonic potential V (x) = x1, gain k = 1 m2/s, and diffusion σ =
+√
+2
+m/√s. Then d0 = 1 m2/s and the commanded velocity is u = (−1, 0)⊤ m/s.
+From Equation (4.10), the right, left, up, down rates are, respectively,
+(r→,r←,r↑,r↓) = (1, 2, 1, 1) s−1.
+Hence every diagonal entry of Q is −5, and each interior-neighbor off-diagonal entry equals the
+corresponding directional rate. The goal and wall boundary-rate vectors, indexed row by row, are
+bG = (2, 0, 0, 2, 0, 0, 2, 0, 0)⊤,
+bW = (1, 1, 2, 0, 0, 1, 1, 1, 2)⊤, (B.3)
+b = (3, 1, 2, 2, 0, 1, 3, 1, 2)⊤.
+Their entries have units s −1. Numerical diagonalization gives the smallest eigenvalue of −Q as
+λ1,h = 1.585786... s−1. Choose the admissible rate λ = 0.7 s−1 and solve
+(−Q − 0.7I9)s =b.
+The resulting grid of S values is
+
+
+1.512023 1 .843765 1 .799062
+1.657936 2 .105079 2.048438
+1.512023 1 .843765 1 .799062
+
+. (B.4)
+19
+
+=== PAGE 20 ===
+HEO
+The boxed center entry is the start value. For a deadline T = 6 s,
+P(2,2)(τ >6) ≤ 2.105079e−0.7·6 = 0.031567.
+Thus the exit-by-six-seconds probability is at least 96.8433%. That is not the safe-goal-arrival prob-
+ability: wall contact is also an exit.
+To evaluate goal success, solve (−Q)p = bW and the ﬁnite-horizon system for q(6). At the
+center the resulting values are
+p(x0) = 0.477204, q(6,x 0) = 0.522740. (B.5)
+Similarly, the goal-weighted linear solve (−Q − 0.7I9)sG = bG givesSG
+0.7(x0) = 1 .086773. Its
+certiﬁed goal-arrival lower bound is
+q(6,x 0) ≥ 1 −p(x0) −SG
+0.7(x0)e−4.2 (B.6)
+≥ 1 − 0.477204 − 1.086773e−4.2 ≈ 0.506500. (B.7)
+The bound is below the exact discrete probability 0.522740, as required. In this deliberately small
+example, the wall risk is high, which also illustrates the need to test both speciﬁcations. The script
+sections/support/time_certificate_grid.py reproduces the numbers.
+Remark 15 (Continuum versus discrete correctness) All numerical equalities in this example
+concern theN = 9 continuous-time Markov chain, not a theorem about an exact Brownian process
+on the square. The upwind chain has a drift-dependent numerical diffusion error of order h. Its
+approximation to the SDE improves with reﬁnement, but formal continuum probability guarantees
+require error bounds such as those discussed in Appendix C.
+Appendix C. V eriﬁcation and Numerical Error Margins
+C.1. Wall-probability residual bound
+For a ﬁxed θ, let pθ solve Equation (4.4). Let ˆpθ ∈ C2(D) ∩C(D) be a numerical reconstruction
+with maximum wall/goal boundary mismatch at most ηb and generator residual |Lθ ˆpθ(x)| ≤ ηr at
+every point ofD. Denote by mmax an upper bound on supx∈D Eθ
+x[τ ]. Dynkin’s formula yields
+Eθ
+x[ˆpθ(Xτ )] − ˆpθ(x) = Eθ
+x
+∫ τ
+0
+Lθ ˆpθ(Xs) ds.
+Since the exact hitting probability equals the expectation of the prescribed boundary payoff, sub-
+tracting gives
+|pθ(x) − ˆpθ(x)| ≤ ηb +ηrEθ
+x[τ ] ≤ηb +ηrmmax.
+Therefore the sufﬁcient validated safety test is ˆpθ(x0)+ηb+ηrmmax ≤δ. The elementary inequality
+eλτ ≥ 1 +λτ supplies
+Eθ
+x[τ ] ≤ Sθ,λ(x) − 1
+λ .
+Thus a separately validated upper bound on S can help obtainmmax. Pointwise residuals computed
+only at mesh nodes do not certify the required uniform bound.
+20
+
+=== PAGE 21 ===
+SPECIFICATION -D RIVEN HARMONIC NAVIGATION
+C.2. Finite-horizon time-probability residual bound
+Let ˆqθ(t,x ) be a sufﬁciently smooth approximation to qθ over [0,T ] ×D. Assume the initial and
+absorbing-boundary mismatches are uniformly bounded by ηib, with the understood compatibility
+qualiﬁcation at boundary–initial-time corners, and
+|∂tˆqθ − Lθ ˆqθ| ≤ ηt for every (t,x ) ∈ [0,T ] ×D.
+The stopped time-dependent Dynkin formula, or equivalently a parabolic comparison argument
+applied to ˆqθ ± (ηib +tηt), gives
+|qθ(T,x 0) − ˆqθ(T,x 0)| ≤ ηib +Tη t.
+Consequently a sufﬁcient veriﬁed deadline test is
+ˆqθ(T,x 0) −ηib −Tη t ≥ 1 −ε.
+Any proposed implementation must still produce reliable residual and interpolation bounds, for
+example through interval estimates, analytic derivative bounds, or veriﬁed ﬁnite-element a posteriori
+techniques. Assembling a matrix and calling a standard ﬂoating-point solver does not in itself prove
+them.
+C.3. Practical scope and open questions
+The ﬁrst implementation may report accurate discrete-model probabilities and a separate continuum-
+validation status. Claims of full continuous-domain guarantees should be made only after numerical
+margins are established. Three key remaining research tasks are (i) low-cost repeated solves and
+adjoints asθ changes, (ii) more informative joint risk/time bounds than a generic union bound, and
+(iii) feasibility tests that scale beyond a handful of boundary coefﬁcients. This draft contains no
+empirical comparison or claim of global synthesis convergence.
+21

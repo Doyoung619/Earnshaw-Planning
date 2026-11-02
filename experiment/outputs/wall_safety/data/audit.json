@@ -1,0 +1,74 @@
+[
+  {
+    "maze": "u_maze",
+    "previous": {
+      "wall_min": 0.5750163902511032,
+      "wall_max": 6.797776977675179,
+      "start_potential": 5.719974705792824,
+      "minimum_wall_minus_adjacent": -0.9830411147755636,
+      "lower_wall_face_fraction": 0.29296875,
+      "minimum_inward_command": -5.861877931022884,
+      "outward_command_face_fraction": 0.2421875,
+      "repulsive_at_grid_faces": false,
+      "minimum_wall_minus_start": -5.144958315541721,
+      "required_certificate_gap": 0.05991464547107983,
+      "discrete_paper_margin_pass": false,
+      "face_count": 256
+    },
+    "uniform_wall_8": {
+      "wall_min": 7.999999999999998,
+      "wall_max": 8.000000000000004,
+      "start_potential": 7.999995939910807,
+      "minimum_wall_minus_adjacent": 1.70960472667403e-07,
+      "lower_wall_face_fraction": 0.0,
+      "minimum_inward_command": 1.5992633937145229e-06,
+      "outward_command_face_fraction": 0.0,
+      "repulsive_at_grid_faces": true,
+      "minimum_wall_minus_start": 4.0600891901831915e-06,
+      "required_certificate_gap": 0.05991464547107983,
+      "discrete_paper_margin_pass": false,
+      "face_count": 256
+    },
+    "best_certificate_margin": {
+      "success": true,
+      "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "best_margin": 4.060089194525072e-06
+    }
+  },
+  {
+    "maze": "narrow",
+    "previous": {
+      "wall_min": 0.22038471322588724,
+      "wall_max": 7.999999999999999,
+      "start_potential": 7.721485659812101,
+      "minimum_wall_minus_adjacent": -0.2675135541047951,
+      "lower_wall_face_fraction": 0.3106060606060606,
+      "minimum_inward_command": -1.915006051420689,
+      "outward_command_face_fraction": 0.24242424242424243,
+      "repulsive_at_grid_faces": false,
+      "minimum_wall_minus_start": -7.501100946586214,
+      "required_certificate_gap": 0.05991464547107983,
+      "discrete_paper_margin_pass": false,
+      "face_count": 264
+    },
+    "uniform_wall_8": {
+      "wall_min": 7.999999999999998,
+      "wall_max": 8.000000000000004,
+      "start_potential": 7.9999999995766915,
+      "minimum_wall_minus_adjacent": 1.2635781310166294e-11,
+      "lower_wall_face_fraction": 0.0,
+      "minimum_inward_command": 1.190267884254581e-10,
+      "outward_command_face_fraction": 0.0,
+      "repulsive_at_grid_faces": true,
+      "minimum_wall_minus_start": 4.233040584722403e-10,
+      "required_certificate_gap": 0.05991464547107983,
+      "discrete_paper_margin_pass": false,
+      "face_count": 264
+    },
+    "best_certificate_margin": {
+      "success": true,
+      "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "best_margin": 2.1981980608665657e-09
+    }
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "basis": [
+    50,
+    100,
+    8
+  ],
+  "mazes": [
+    "u_maze",
+    "narrow"
+  ],
+  "grid": 40,
+  "maxiter": 180,
+  "mc": 5000,
+  "steps": 96,
+  "sigma": 0.2,
+  "gain": 1.0,
+  "seed": 20261101
+}

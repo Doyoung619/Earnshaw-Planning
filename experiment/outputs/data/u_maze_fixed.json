@@ -1,0 +1,52 @@
+{
+  "maze": "u_maze",
+  "spec_name": "S2",
+  "delta": 0.05,
+  "epsilon": 0.05,
+  "T": 15.0,
+  "mode": "fixed",
+  "theta": [
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0
+  ],
+  "p": 0.9999555917523516,
+  "q": 1.2427319703140448e-08,
+  "rho": 0.9499999875726802,
+  "ctmc_pass": false,
+  "sde_point_pass": false,
+  "sde_ci_pass": false,
+  "mean_exit_ctmc": 5.999079765179419,
+  "max_command_speed": 7.116831238067585,
+  "optimization_seconds": 0.0,
+  "evaluations": 0,
+  "optimizer_message": "Fixed boundary values",
+  "sde": {
+    "n": 5000,
+    "collision_rate": 0.9998,
+    "collision_ci": [
+      0.998867881829747,
+      0.9999646951247276
+    ],
+    "arrival_rate": 0.0,
+    "arrival_ci": [
+      0.0,
+      0.000767730137580694
+    ],
+    "timeout_rate": 0.0002,
+    "eventual_goal_rate": 0.0,
+    "risk_lower": 0.9998,
+    "risk_upper": 1.0,
+    "mean_exit_observed": 5.0187857584014575,
+    "restricted_mean_exit": 5.026782001249777,
+    "horizon": 45.0,
+    "simulation_seconds": 4.9596516999881715,
+    "dt": 0.0036028711069995647
+  },
+  "residual": 4.6629367034256575e-15
+}

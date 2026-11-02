@@ -1,0 +1,74 @@
+[
+  {
+    "maze": "open",
+    "spec_name": "S1",
+    "delta": 0.1,
+    "epsilon": 0.1,
+    "T": 15.0,
+    "M": 8,
+    "boundary_basis": "spatial",
+    "mode": "joint",
+    "theta": [
+      7.775048963846628,
+      7.8507351548089614,
+      7.765466519334077,
+      7.659812869307736,
+      7.997555043874839,
+      8.0,
+      7.863178087909553,
+      7.5794512371124405
+    ],
+    "p": 0.0038120749634083712,
+    "q": 0.9961861546478763,
+    "rho": 0.0,
+    "ctmc_pass": true,
+    "sde_point_pass": true,
+    "sde_ci_pass": true,
+    "mean_exit_ctmc": 3.7560015196981738,
+    "max_command_speed": 20.312807890149404,
+    "optimization_seconds": 1.374858100025449,
+    "evaluations": 6,
+    "optimizer_message": "Optimization terminated successfully",
+    "sde": {
+      "n": 200,
+      "collision_rate": 0.0,
+      "collision_ci": [
+        0.0,
+        0.018846005918320894
+      ],
+      "arrival_rate": 1.0,
+      "arrival_ci": [
+        0.9811539940816791,
+        1.0
+      ],
+      "timeout_rate": 0.0,
+      "eventual_goal_rate": 1.0,
+      "risk_lower": 0.0,
+      "risk_upper": 0.0,
+      "risk_upper_ci": [
+        0.0,
+        0.018846005918320894
+      ],
+      "mean_exit_observed": 3.5102284499241483,
+      "restricted_mean_exit": 3.5102284499241483,
+      "horizon": 45.0,
+      "simulation_seconds": 1.2394302999600768,
+      "dt": 0.0012623082825225817
+    },
+    "residual": 3.552713678800501e-15,
+    "wall_audit": {
+      "wall_min": 7.695058677512457,
+      "wall_max": 7.954755457089684,
+      "start_potential": 7.765611486063194,
+      "minimum_wall_minus_adjacent": 7.842606751967685e-05,
+      "lower_wall_face_fraction": 0.0,
+      "minimum_inward_command": -2.220446049250313e-16,
+      "outward_command_face_fraction": 0.0,
+      "repulsive_at_grid_faces": true,
+      "minimum_wall_minus_start": -0.07055280855073587,
+      "required_certificate_gap": 0.046051701859880924,
+      "discrete_paper_margin_pass": false,
+      "face_count": 152
+    }
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "maze": "open",
+    "V_start": 7.853773947656316,
+    "wall_gap": 0.14622605234368358,
+    "start_speed": 0.29842589290782207,
+    "constant_wall_continuum_identity_proxy": 0.0006679464066686234
+  },
+  {
+    "maze": "u_maze",
+    "V_start": 7.999995939910807,
+    "wall_gap": 4.060089192847727e-06,
+    "start_speed": 1.28919379816965e-05,
+    "constant_wall_continuum_identity_proxy": 0.9997970161443687
+  },
+  {
+    "maze": "narrow",
+    "V_start": 7.9999999995766915,
+    "wall_gap": 4.233084993643388e-10,
+    "start_speed": 1.1865632774382612e-09,
+    "constant_wall_continuum_identity_proxy": 0.9999999788345753
+  }
+]
